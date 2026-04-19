@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,30 +10,46 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      sizes="any"
+      href="Image/favicon.svg?v=20260419"
+    />
+    <link
+      rel="shortcut icon"
+      type="image/svg+xml"
+      href="Image/favicon.svg?v=20260419"
+    />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <div class="app-shell">
       <header class="app-header">
-        <div>
-          <p class="eyebrow">Vanilla JS Kanban</p>
-          <h1>MiniTask Board</h1>
-          <p class="sub">State-driven UI with localStorage + SortableJS</p>
+        <div class="brand">
+          <img
+            class="brand-icon"
+            src="Image/UI%20icon.svg"
+            alt="MiniTask UI icon"
+            width="200"
+            height="200"
+          />
         </div>
         <div class="controls">
           <input
             id="keywordFilter"
             type="search"
-            placeholder="Tim task theo tu khoa..."
-            aria-label="Loc theo tu khoa"
+            placeholder="Search tasks..."
+            aria-label="Filter by keyword"
           />
-          <select id="priorityFilter" aria-label="Loc theo do uu tien">
-            <option value="all">Tat ca do uu tien</option>
+          <select id="priorityFilter" aria-label="Filter by priority">
+            <option value="all">All priorities</option>
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>
           </select>
-          <button id="darkToggle" type="button">Dark mode</button>
+          <button id="addListBtn" type="button">+ Add List</button>
+          <button id="darkToggle" type="button">Night mode</button>
           <button id="exportBtn" type="button">Export JSON</button>
           <button id="importBtn" type="button">Import JSON</button>
           <input
@@ -46,9 +62,193 @@
       </header>
 
       <main>
-        <p id="dragHint" class="drag-hint" aria-live="polite"></p>
         <section id="board" class="board" aria-label="Kanban board"></section>
       </main>
+    </div>
+
+    <div id="taskModal" class="task-modal" hidden>
+      <div class="task-modal-backdrop" data-action="close-modal"></div>
+      <section
+        class="task-modal-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="taskModalTitle"
+      >
+        <header class="task-modal-header">
+          <h2 id="taskModalTitle">Add New Task</h2>
+          <button type="button" class="modal-close" data-action="close-modal">
+            Close
+          </button>
+        </header>
+
+        <form id="taskModalForm" class="task-modal-form">
+          <label for="taskTitle">Name Task</label>
+          <input
+            id="taskTitle"
+            name="title"
+            type="text"
+            maxlength="180"
+            required
+          />
+
+          <div class="editor-label-row">
+            <span>Description</span>
+            <div
+              class="editor-toolbar"
+              role="toolbar"
+              aria-label="Description formatting"
+            >
+              <button type="button" data-editor-cmd="bold">
+                <strong>B</strong>
+              </button>
+              <button type="button" data-editor-cmd="italic"><em>I</em></button>
+              <button type="button" data-editor-cmd="underline">
+                <u>U</u>
+              </button>
+              <button type="button" data-editor-cmd="insertUnorderedList">
+                Bullet
+              </button>
+              <button type="button" data-editor-cmd="insertOrderedList">
+                Number
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="taskDescriptionEditor"
+            class="rich-editor"
+            contenteditable="true"
+            data-placeholder="Write detailed description..."
+          ></div>
+          <input
+            id="taskDescriptionInput"
+            name="descriptionHtml"
+            type="hidden"
+          />
+
+          <div class="time-grid">
+            <div>
+              <label for="taskStartAt">Start Time</label>
+              <input
+                id="taskStartAt"
+                name="startAt"
+                type="datetime-local"
+                required
+              />
+            </div>
+            <div>
+              <label for="taskEndAt">End Time</label>
+              <input
+                id="taskEndAt"
+                name="endAt"
+                type="datetime-local"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="modal-meta-row">
+            <div class="color-picker-group meta-color-picker">
+              <div>
+                <div class="meta-color-label-row">
+                  <label for="taskPriority">Priority</label>
+                  <p></p>
+                </div>
+                <select id="taskPriority" name="priority">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+            </div>
+            <div class="color-picker-group meta-color-picker">
+              <div class="meta-color-label-row">
+                <label for="taskColor">Color</label>
+              </div>
+              <div class="color-palette" id="colorPalette" role="list"></div>
+              <input
+                id="taskColor"
+                name="color"
+                type="hidden"
+                value="#0f766e"
+              />
+            </div>
+          </div>
+
+          <div class="modal-tag-row">
+            <div class="meta-color-label-row">
+              <label for="taskTagText">Tag</label>
+              <p id="taskTagColorName" class="color-name-label">Ocean</p>
+            </div>
+            <div class="modal-tag-controls">
+              <input
+                id="taskTagText"
+                name="tagText"
+                type="text"
+                maxlength="36"
+                placeholder="e.g. Client A"
+              />
+            </div>
+            <div class="color-picker-group meta-color-picker tag-color-picker">
+              <div
+                class="color-palette tag-color-palette"
+                id="tagColorPalette"
+                role="list"
+              ></div>
+              <input
+                id="taskTagColor"
+                name="tagColor"
+                type="hidden"
+                value="#0ea5c6"
+              />
+            </div>
+            <p id="taskTagPreview" class="tag-preview-chip is-empty">No tag</p>
+          </div>
+
+          <div class="task-modal-actions">
+            <button type="button" data-action="close-modal">Cancel</button>
+            <button type="submit" class="primary-btn">Save Task</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="listModal" class="task-modal list-modal" hidden>
+      <div class="task-modal-backdrop" data-action="close-list-modal"></div>
+      <section
+        class="task-modal-panel list-modal-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="listModalTitle"
+      >
+        <header class="task-modal-header">
+          <h2 id="listModalTitle">Create New List</h2>
+          <button
+            type="button"
+            class="modal-close"
+            data-action="close-list-modal"
+          >
+            Close
+          </button>
+        </header>
+
+        <form id="listModalForm" class="task-modal-form list-modal-form">
+          <label for="listNameInput">List Name</label>
+          <input
+            id="listNameInput"
+            name="name"
+            type="text"
+            maxlength="40"
+            required
+            placeholder="e.g. Backlog"
+          />
+
+          <div class="task-modal-actions">
+            <button type="button" data-action="close-list-modal">Cancel</button>
+            <button type="submit" class="primary-btn">Create List</button>
+          </div>
+        </form>
+      </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>

@@ -7,11 +7,11 @@ function clearSortables() {
   }
 }
 
-export function initDragAndDrop({ enabled, onEnd }) {
+export function initDragAndDrop({ enabled, onTaskEnd, onColumnEnd }) {
   clearSortables();
 
   if (!window.Sortable) {
-    console.error("SortableJS chua duoc nap.");
+    console.error("SortableJS is not loaded.");
     return;
   }
 
@@ -23,12 +23,28 @@ export function initDragAndDrop({ enabled, onEnd }) {
       animation: 150,
       disabled: !enabled,
       onEnd: (evt) => {
-        if (typeof onEnd === "function") {
-          onEnd(evt);
+        if (typeof onTaskEnd === "function") {
+          onTaskEnd(evt);
         }
       },
     });
 
     sortableInstances.push(sortable);
   });
+
+  const board = document.getElementById("board");
+  if (!board) return;
+
+  const columnSortable = new window.Sortable(board, {
+    animation: 170,
+    draggable: ".column",
+    handle: ".column-drag-handle",
+    onEnd: (evt) => {
+      if (typeof onColumnEnd === "function") {
+        onColumnEnd(evt);
+      }
+    },
+  });
+
+  sortableInstances.push(columnSortable);
 }
