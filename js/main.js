@@ -32,6 +32,17 @@ const listModalRefs = {
   input: null,
 };
 
+const deleteModalRefs = {
+  root: null,
+  message: null,
+  confirmBtn: null,
+};
+
+const deleteState = {
+  columnId: "",
+  taskId: "",
+};
+
 const modalRefs = {
   root: null,
   heading: null,
@@ -338,15 +349,42 @@ function handleDeleteTask(button) {
   const context = getTaskContextByElement(button);
   if (!context) return;
 
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this task?",
-  );
-  if (!confirmed) return;
+  openDeleteModal(context);
+}
 
-  context.column.tasks = context.column.tasks.filter(
-    (task) => task.id !== context.taskId,
-  );
+function openDeleteModal(context) {
+  if (!deleteModalRefs.root || !deleteModalRefs.message) return;
 
+  deleteState.columnId = context.columnId;
+  deleteState.taskId = context.taskId;
+
+  const safeTitle = context.task.title || "this task";
+  deleteModalRefs.message.textContent = `Are you sure you want to delete "${safeTitle}"? This action cannot be undone.`;
+  deleteModalRefs.root.hidden = false;
+
+  window.requestAnimationFrame(() => {
+    deleteModalRefs.confirmBtn?.focus();
+  });
+}
+
+function closeDeleteModal() {
+  if (!deleteModalRefs.root) return;
+
+  deleteModalRefs.root.hidden = true;
+  deleteState.columnId = "";
+  deleteState.taskId = "";
+}
+
+function confirmDeleteTask() {
+  const column = findColumn(deleteState.columnId);
+  if (!column || !deleteState.taskId) {
+    closeDeleteModal();
+    return;
+  }
+
+  column.tasks = column.tasks.filter((task) => task.id !== deleteState.taskId);
+
+  closeDeleteModal();
   commit({ ...board, columns: [...board.columns] });
 }
 
@@ -657,6 +695,16 @@ function handleGlobalClick(event) {
     return;
   }
 
+  if (action === "close-delete-modal") {
+    closeDeleteModal();
+    return;
+  }
+
+  if (action === "confirm-delete-task") {
+    confirmDeleteTask();
+    return;
+  }
+
   if (action === "complete-task") {
     handleCompleteTask(actionEl);
     return;
@@ -843,6 +891,24 @@ function setupListModal() {
   });
 }
 
+function setupDeleteModal() {
+  deleteModalRefs.root = document.getElementById("deleteModal");
+  deleteModalRefs.message = document.getElementById("deleteModalMessage");
+  deleteModalRefs.confirmBtn = document.querySelector(
+    '[data-action="confirm-delete-task"]',
+  );
+
+  document.addEventListener("keydown", (event) => {
+    if (
+      event.key === "Escape" &&
+      deleteModalRefs.root &&
+      !deleteModalRefs.root.hidden
+    ) {
+      closeDeleteModal();
+    }
+  });
+}
+
 function setupBrandIconEffect() {
   const brand = document.querySelector(".brand");
   const brandIcon = document.querySelector(".brand-icon");
@@ -863,6 +929,7 @@ function init() {
   setupGlobalEvents();
   setupModal();
   setupListModal();
+  setupDeleteModal();
   setupStaticControls();
   setupBrandIconEffect();
   draw();

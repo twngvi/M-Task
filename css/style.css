@@ -533,6 +533,24 @@ button:hover {
   width: min(460px, calc(100vw - 24px));
 }
 
+.confirm-modal-panel {
+  width: min(500px, calc(100vw - 24px));
+}
+
+.confirm-modal-header h2 {
+  color: color-mix(in srgb, var(--danger) 65%, var(--text));
+}
+
+.confirm-modal-body {
+  padding: 2px 0 6px;
+}
+
+.confirm-modal-body p {
+  margin: 0;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text) 85%, var(--muted));
+}
+
 .list-modal-form {
   gap: 12px;
 }
@@ -742,6 +760,17 @@ button:hover {
 .primary-btn:hover {
   border-color: var(--accent-deep);
   background: var(--accent-deep);
+}
+
+.danger-btn {
+  background: color-mix(in srgb, var(--danger) 88%, #000000 12%);
+  border-color: color-mix(in srgb, var(--danger) 92%, #000000 8%);
+  color: #ffffff;
+}
+
+.danger-btn:hover {
+  background: color-mix(in srgb, var(--danger) 74%, #000000 26%);
+  border-color: color-mix(in srgb, var(--danger) 78%, #000000 22%);
 }
 
 @media (max-width: 980px) {
