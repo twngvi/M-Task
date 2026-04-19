@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MiniTask | Kanban Task Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Vanilla JS Kanban</p>
+          <h1>MiniTask Board</h1>
+          <p class="sub">State-driven UI with localStorage + SortableJS</p>
+        </div>
+        <div class="controls">
+          <input
+            id="keywordFilter"
+            type="search"
+            placeholder="Tim task theo tu khoa..."
+            aria-label="Loc theo tu khoa"
+          />
+          <select id="priorityFilter" aria-label="Loc theo do uu tien">
+            <option value="all">Tat ca do uu tien</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <button id="darkToggle" type="button">Dark mode</button>
+          <button id="exportBtn" type="button">Export JSON</button>
+          <button id="importBtn" type="button">Import JSON</button>
+          <input
+            id="importInput"
+            type="file"
+            accept="application/json"
+            hidden
+          />
+        </div>
+      </header>
+
+      <main>
+        <p id="dragHint" class="drag-hint" aria-live="polite"></p>
+        <section id="board" class="board" aria-label="Kanban board"></section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
